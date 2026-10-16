@@ -1,4 +1,4 @@
-# B站去广告（自托管增强版 1.4.0）
+# B站去广告
 
 适用于 Surge 的 B站去广告模块。运行文件全部使用本仓库地址，减少外部脚本失效带来的影响。
 
@@ -28,11 +28,19 @@ https://raw.githubusercontent.com/Hey-sayiwanna/bilibiliAdBlock/main/bilibiliADB
 
 ## 从旧版更新
 
-1. 在 Surge 更新此模块，确认模块版本为 **1.4.0**。
-2. 更新模块引用的脚本，等待两个自托管脚本下载完成。
+1. 在 Surge 更新此模块，确认模块版本为 **1.4.1**。
+2. 更新模块引用的脚本，等待三个自托管脚本下载完成。
 3. 完全退出 B站 App 后重新打开。
 
 订阅地址保持不变，新脚本使用带版本的文件名，避免沿用旧脚本缓存。不要同时启用其他处理相同 B站接口的去广告模块。
+
+## 1.4.1：iPad 加载兼容性修复
+
+iPad 客户端 `bili-hd` / `bili-hd2` 使用 Moss 引擎时，改写后的 gRPC 响应需要显式完成状态。1.4.0 的兼容分支遗漏了该客户端，部分评论、播放进度及默认搜索词响应缺少 `grpc-status: 0`，可能导致客户端持续等待或重试。
+
+1.4.1 在成功处理后补齐 iPad 缺失的状态；默认搜索词改为按客户端生成空响应，继续保留国际版的既有状态规则。HTTP/gRPC 错误仍原样放行，广告识别逻辑未调整。
+
+使用本地故障记录逐一离线重放，七份响应正文保持逐字节一致，仅补齐缺失的完成状态。回归测试使用重新构造的数据，不包含用户原始抓包、评论、Cookie 或账号信息。iPad 实际界面恢复情况仍需更新后验证。
 
 ## 实现方式
 
@@ -60,7 +68,7 @@ npm test
 npm run test:upstream
 ```
 
-构建通过本地入口 `scripts/bilibili-response.mjs` 引用固定的 `upstream/Biliverse-ADBlock-v0.7.3/src/process/Response.mjs`，生成 `vendor/Biliverse.ADBlock.v0.7.3.response.bundle.js`，同时生成带版本的本地 JSON 脚本。本地入口保留原始 HTTP/gRPC 错误响应，并避免同时返回新旧二进制响应体。维护本地 JSON 逻辑时修改 `scripts/bilibili-json.js`，再重新构建。
+构建通过本地入口 `scripts/bilibili-response.mjs` 引用固定的 `upstream/Biliverse-ADBlock-v0.7.3/src/process/Response.mjs`，生成 `vendor/Biliverse.ADBlock.v0.7.3.ipad-fix-v1.4.1.response.bundle.js`，同时生成客户端适配的默认搜索词响应脚本 `scripts/bilibili-default-words.v1.4.1.js`，以及未改动的本地 JSON 脚本。本地入口保留原始 HTTP/gRPC 错误响应，并避免同时返回新旧二进制响应体。维护本地 JSON 逻辑时修改 `scripts/bilibili-json.js`，再重新构建。
 
 本仓库测试执行实际发布脚本，检查规则命中、正常内容保留、压缩 gRPC 和未知字段保留。`test:upstream` 运行参考源码中与业务处理相关的四组回归测试，不包含本模块未接入的设置面板构建测试。
 

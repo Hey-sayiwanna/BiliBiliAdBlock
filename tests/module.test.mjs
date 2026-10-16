@@ -27,7 +27,7 @@ test("published local JSON artifact matches its maintained source", () => {
 });
 
 test("binary response rules have no size cutoff that would skip large video pages", () => {
-  for (const line of moduleText.split("\n").filter(line => line.includes("binary-body-mode=1"))) {
+  for (const line of moduleText.split("\n").filter(line => line.includes("type=http-response") && line.includes("binary-body-mode=1"))) {
     assert.match(line, /max-size=-1/);
     assert.match(line, /requires-body=true/);
   }
