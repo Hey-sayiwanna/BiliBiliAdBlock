@@ -1,6 +1,7 @@
 import { Console, done } from "@nsnanocat/util";
 import gRPC from "@nsnanocat/grpc";
 import { Response } from "../upstream/Biliverse-ADBlock-v0.7.3/src/process/Response.mjs";
+import fixGrpcHeaders from "./fix-grpc-headers.mjs";
 
 // 上游错误必须保留，避免将网络失败重写成空的成功响应。
 // Preserve upstream errors instead of rewriting failures as empty successful replies.
@@ -19,6 +20,9 @@ import { Response } from "../upstream/Biliverse-ADBlock-v0.7.3/src/process/Respo
     }
     if (status >= 200 && status < 300 && (grpcStatus === undefined || String(grpcStatus).trim() === "0")) {
       output = await Response($request, { ...$response, headers: { ...$response.headers } });
+      if (["application/grpc", "application/grpc+proto", "application/grpc-web"].includes(String(headers["content-type"]).split(";")[0].trim())) {
+        output.headers = fixGrpcHeaders($request.headers, output.headers);
+      }
       // Surge 不应同时收到改写后的 body 与旧的 bodyBytes。
       // Do not return rewritten body alongside stale bodyBytes in Surge.
       if (output.body !== undefined) delete output.bodyBytes;
