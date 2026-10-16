@@ -23,8 +23,36 @@ try {
 
 function cleanResponse(path, data) {
   switch (path) {
+    case "/x/v2/splash/show":
+    case "/x/v2/splash/list":
+    case "/x/v2/splash/brand/list":
+    case "/x/v2/splash/event/list2":
+      if (data?.data && typeof data.data === "object") {
+        for (const key of ["account", "event_list", "preload", "show"]) delete data.data[key];
+      }
+      break;
     case "/x/v2/feed/index":
       cleanFeed(data);
+      break;
+    case "/x/v2/feed/index/story":
+    case "/x/v2/feed/index/relate/story":
+      if (Array.isArray(data?.data?.items)) {
+        data.data.items = data.data.items.filter((item) => item && !isAd(item) &&
+          !["vertical_ad_av", "vertical_ad_picture", "vertical_ad_live", "vertical_pgc"].includes(item.card_goto));
+        for (const item of data.data.items) {
+          if (!Array.isArray(item.share_bottom_button)) continue;
+          item.share_bottom_button = item.share_bottom_button.filter((button) => {
+            if (button?.type !== 20 || !Array.isArray(button.button_metas)) return true;
+            return !button.button_metas.some((meta) => {
+              if (meta?.text === "助TA必火") return true;
+              try {
+                const link = new URL(meta?.link);
+                return link.hostname === "cm.bilibili.com" && link.pathname === "/fly-h5";
+              } catch { return false; }
+            });
+          });
+        }
+      }
       break;
     case "/x/v2/search/square":
       if (Array.isArray(data?.data)) {
@@ -39,6 +67,7 @@ function cleanResponse(path, data) {
       cleanLiveRoom(data);
       break;
     case "/xlive/app-interface/v2/index/feed":
+    case "/xlive/app-interface/v2/room/recList":
       cleanLiveFeed(data?.data);
       break;
     case "/xlive/app-interface/v2/second/getList":
@@ -75,7 +104,8 @@ function cleanLiveRoom(data) {
 function cleanLiveFeed(data) {
   if (!data || typeof data !== "object") return;
   for (const key of ["card_list", "items", "list"]) {
-    if (Array.isArray(data[key])) data[key] = data[key].filter((item) => !isAd(item));
+    if (Array.isArray(data[key])) data[key] = data[key].filter((item) =>
+      !isAd(item) && !isLiveAd(item) && !isLiveAd(item?.card_data?.small_card_v1));
   }
   for (const key of ["banner", "banner_list", "activity_banner", "activity_banner_info"]) {
     if (key in data) data[key] = Array.isArray(data[key]) ? [] : null;
@@ -92,6 +122,14 @@ function cleanLiveTab(data) {
   }
 }
 
+function isLiveAd(card) {
+  if (!card || typeof card !== "object") return false;
+  const transparent = card.ad_transparent_content;
+  return [true, 1, "1"].includes(card.is_ad) || [true, 1, "1"].includes(card.show_ad_icon) ||
+    (typeof transparent === "string" ? transparent.trim().length > 0 :
+      transparent && typeof transparent === "object" ? Object.keys(transparent).length > 0 : Boolean(transparent));
+}
+
 function isAd(item) {
   if (!item || typeof item !== "object") return false;
   const cardType = String(item.card_type ?? "").toLowerCase();
@@ -100,11 +138,11 @@ function isAd(item) {
   const type = String(item.type ?? "").toLowerCase();
 
   return Boolean(
-    item.ad_info ||
-      item.cm ||
+    item.cm ||
       item.is_ad === 1 ||
       item.is_ad === true ||
       type === "ad" ||
+      type === "ad_inline" ||
       goto === "ad" ||
       cardType.startsWith("cm_") ||
       cardType.startsWith("ad_") ||

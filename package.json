@@ -1,0 +1,22 @@
+{
+  "name": "bilibili-adblock-self-hosted",
+  "version": "1.4.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-vendor.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "test:upstream": "node --test upstream/Biliverse-ADBlock-v0.7.3/tests/adTrackingHardening.test.mjs upstream/Biliverse-ADBlock-v0.7.3/tests/airelateAsync.test.mjs upstream/Biliverse-ADBlock-v0.7.3/tests/honoWorkerAdapter.test.mjs upstream/Biliverse-ADBlock-v0.7.3/tests/preferences-template.test.mjs"
+  },
+  "devDependencies": {
+    "@biliverse/protobuf": "1.1.0",
+    "@nsnanocat/grpc": "1.1.0",
+    "@nsnanocat/util": "2.7.6",
+    "@protobuf-ts/runtime": "2.11.1",
+    "@rollup/plugin-commonjs": "29.0.2",
+    "@rollup/plugin-node-resolve": "16.0.3",
+    "@rollup/plugin-terser": "1.0.0",
+    "crypto-js": "4.2.0",
+    "rollup": "4.63.1"
+  }
+}

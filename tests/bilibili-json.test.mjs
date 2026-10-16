@@ -67,3 +67,55 @@ test("account mine response stays byte-for-byte equivalent", () => {
   const output = run("/x/v2/account/mine", input);
   assert.deepEqual(output, input);
 });
+
+test("feed keeps ordinary videos carrying ad_info metadata", () => {
+  const video = { id: "video", card_type: "small_cover_v2", card_goto: "av", ad_info: {} };
+  assert.deepEqual(run("/x/v2/feed/index", { data: { items: [video] } }).data.items, [video]);
+});
+
+test("feed removes inline banner ads and keeps activity banners", () => {
+  const output = run("/x/v2/feed/index", { data: { items: [{
+    card_type: "banner_ipad_v8", banner_item: [{ type: "ad_inline" }, { type: "activity" }],
+  }] } });
+  assert.deepEqual(output.data.items[0].banner_item, [{ type: "activity" }]);
+});
+
+for (const path of ["/x/v2/feed/index/story", "/x/v2/feed/index/relate/story"]) {
+  test(`${path} removes commercial cards and keeps ordinary vertical videos`, () => {
+    const output = run(path, { data: { items: [
+      { id: "video", card_goto: "vertical_av", share_bottom_button: [
+        { type: 20, button_metas: [{ text: "助TA必火", link: "https://cm.bilibili.com/fly-h5" }] },
+        { type: 1, button_metas: [{ text: "分享" }] },
+      ] },
+      ...["vertical_ad_av", "vertical_ad_picture", "vertical_ad_live", "vertical_pgc"].map(card_goto => ({ card_goto })),
+    ] } });
+    assert.deepEqual(output.data.items, [{ id: "video", card_goto: "vertical_av", share_bottom_button: [
+      { type: 1, button_metas: [{ text: "分享" }] },
+    ] }]);
+  });
+}
+
+test("live feed removes nested advertising cards and keeps real live rooms", () => {
+  const normal = { card_data: { small_card_v1: { roomid: 1, is_ad: 0, ad_transparent_content: "" } } };
+  const output = run("/xlive/app-interface/v2/index/feed", { data: { card_list: [
+    normal,
+    { card_data: { small_card_v1: { roomid: 2, show_ad_icon: "1" } } },
+    { card_data: { small_card_v1: { roomid: 3, ad_transparent_content: "commercial" } } },
+  ] } });
+  assert.deepEqual(output.data.card_list, [normal]);
+});
+
+test("live recommendations remove explicit ads without discarding normal rooms", () => {
+  assert.deepEqual(run("/xlive/app-interface/v2/room/recList", { data: {
+    list: [{ roomid: 1 }, { roomid: 2, is_ad: "1" }],
+  } }).data.list, [{ roomid: 1 }]);
+});
+
+for (const path of ["/x/v2/splash/list", "/x/v2/splash/brand/list", "/x/v2/splash/event/list2"]) {
+  test(`${path} clears preloaded splash ads while preserving unrelated settings`, () => {
+    const output = run(path, { code: 0, data: {
+      show: [{ id: 1 }], event_list: [{ id: 2 }], preload: [{ id: 3 }], account: { id: 4 }, keep: true,
+    } });
+    assert.deepEqual(output, { code: 0, data: { keep: true } });
+  });
+}

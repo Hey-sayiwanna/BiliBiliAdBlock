@@ -1,0 +1,74 @@
+name: Deploy
+on:
+  push:
+    # Sequence of patterns matched against refs/heads
+    branches:
+      - dev
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  dev:
+    uses: ./.github/workflows/dev.yml
+    secrets: inherit
+  deploy-pages:
+    needs: dev
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+        with:
+          ref: dev
+      - name: Install Node Dependencies
+        uses: ./.github/actions/node-build
+        with:
+          package-token: ${{ secrets.PACKAGE_TOKEN }}
+      - name: Deploy Cloudflare Pages
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy pages --project-name adblock --branch dev
+          wranglerVersion: "4.127.1"
+  deploy-workers:
+    needs: dev
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+        with:
+          ref: dev
+          submodules: recursive
+          token: ${{ secrets.SUBMODULE_TOKEN }}
+      - name: Install Node Dependencies
+        uses: ./.github/actions/node-build
+        with:
+          package-token: ${{ secrets.PACKAGE_TOKEN }}
+      - name: Deploy Cloudflare Worker
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --minify -c wrangler.workers.jsonc
+          wranglerVersion: "4.127.1"
+  deploy:
+    needs: dev
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: artifact
+      - name: Publish scripts, configuration and subscriptions together
+        env:
+          GH_TOKEN: ${{ secrets.GIST_TOKEN }}
+        run: |
+          node --input-type=module <<'JS'
+          import { readFile, writeFile } from "node:fs/promises";
+          const names = ["request.dev.bundle.js","response.dev.bundle.js","BiliBili.ADBlock.dev.sgmodule","BiliBili.ADBlock.dev.plugin","BiliBili.ADBlock.dev.snippet","BiliBili.ADBlock.dev.stoverride","config.dev.bundle.js","BiliBili.ADBlock.dev.boxjs.json"];
+          const files = Object.fromEntries(await Promise.all(names.map(async name => [name, { content: await readFile(`dist/${name}`, "utf8") }])));
+          await writeFile("gist-update.json", JSON.stringify({ description: "📺 BiliBili: 🛡️ ADBlock β", files }));
+          JS
+          gh api --method PATCH gists/0b0c5ac2b8977d5461d4b3276d120896 --input gist-update.json --silent
