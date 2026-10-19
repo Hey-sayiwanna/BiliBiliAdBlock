@@ -64,21 +64,6 @@ https://raw.githubusercontent.com/Hey-sayiwanna/bilibiliAdBlock/main/bilibiliADB
 
 旧版本产物保留供旧模块引用；当前模块仅引用上表的两个运行文件。
 
-## 构建与验证
-
-使用 Node.js 24 或更高版本，在仓库根目录运行：
-
-```sh
-npm ci --ignore-scripts
-npm run build
-npm test
-npm run test:upstream
-```
-
-构建从固定的 `upstream/Biliverse-ADBlock-v0.7.5` 源码快照生成当前运行脚本，上游快照保持原样。JSON 接口清理广告卡片；Protobuf/gRPC 接口解码后删除广告字段并重新编码。本地适配保留原始 HTTP/gRPC 错误、异常时放行原响应，并避免同时返回新旧二进制正文。
-
-测试直接执行当前模块引用的脚本，检查广告移除、普通内容保留、iPad 加载兼容、竖屏短视频、压缩响应和未知字段保留。`test:upstream` 执行六组相关回归测试，包含最新 gRPC 状态和原生空响应测试，不包含未接入的设置面板构建测试。故障回归使用重新构造的数据，不包含用户原始抓包、评论、Cookie 或账号信息。
-
 ## 鸣谢与开源说明
 
 感谢 **薯薯及所有上游贡献者**，感谢 [Biliverse/ADBlock](https://github.com/Biliverse/ADBlock)（原 BiliUniverse/ADBlock）开源去广告实现，也感谢相关 Protobuf、gRPC 和工具库的维护者。[上游使用指南](https://biliverse.github.io/guide/ad-block.html)。
