@@ -1,4 +1,4 @@
-import upstreamFixHeaders from "../upstream/Biliverse-ADBlock-v0.7.3/src/function/fixHeaders.mjs";
+import upstreamFixHeaders from "../upstream/Biliverse-ADBlock-v0.7.5/src/function/fixHeaders.mjs";
 
 /**
  * 补齐 iPad Moss 引擎需要的完成状态，保留现有客户端规则。
@@ -9,7 +9,8 @@ import upstreamFixHeaders from "../upstream/Biliverse-ADBlock-v0.7.3/src/functio
  */
 export default function fixGrpcHeaders(requestHeaders, responseHeaders) {
   const request = Object.fromEntries(Object.entries(requestHeaders ?? {}).map(([key, value]) => [key.toLowerCase(), value]));
-  const headers = upstreamFixHeaders(request, responseHeaders);
+  const normalized = Object.fromEntries(Object.entries(responseHeaders ?? {}).map(([key, value]) => [key.toLowerCase(), value]));
+  const headers = Object.fromEntries(Object.entries(upstreamFixHeaders(request, normalized)).map(([key, value]) => [key.toLowerCase(), value]));
   const ua = String(request["user-agent"] ?? "");
   const hasStatus = Object.keys(headers).some(key => key.toLowerCase() === "grpc-status");
   if (/(?:^|\s)bili-hd2?\//i.test(ua) && String(request["x-bili-moss-engine-type"]) === "1" && !hasStatus) {

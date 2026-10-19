@@ -1,0 +1,32 @@
+name: Dev
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+          token: ${{ secrets.SUBMODULE_TOKEN }}
+          ref: dev
+      - name: Run Build Pipeline
+        uses: ./.github/actions/node-build
+        with:
+          package-token: ${{ secrets.PACKAGE_TOKEN }}
+          build-command: npm run dev
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: artifact
+          path: |
+            CHANGELOG.md
+            rulesets
+            dist

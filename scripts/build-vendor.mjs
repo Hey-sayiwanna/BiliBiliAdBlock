@@ -9,8 +9,7 @@ import { copyFile } from "node:fs/promises";
 // Build standalone Surge scripts from the pinned source and dependencies.
 const root = new URL("../", import.meta.url);
 for (const [input, file] of [
-  ["scripts/bilibili-response.mjs", "vendor/Biliverse.ADBlock.v0.7.3.ipad-fix-v1.4.1.response.bundle.js"],
-  ["scripts/bilibili-default-words.mjs", "scripts/bilibili-default-words.v1.4.1.js"],
+  ["scripts/bilibili-response.mjs", "vendor/Biliverse.ADBlock.v0.7.5.v1.4.2.response.bundle.js"],
 ]) {
   const build = await rollup({
     input: fileURLToPath(new URL(input, root)),
@@ -20,7 +19,7 @@ for (const [input, file] of [
     await build.write({
       file: fileURLToPath(new URL(file, root)),
       format: "es",
-      banner: "/*! Biliverse/ADBlock v0.7.3 | Apache-2.0 | Local Surge entry adapter | See THIRD_PARTY_NOTICES.md */\nconsole.log('[Bilibili AdBlock] self-hosted 1.4.1 / iPad grpc-status fix');",
+      banner: "/*! Biliverse/ADBlock v0.7.5 | Apache-2.0 | Local Surge entry adapter | See THIRD_PARTY_NOTICES.md */\nconsole.log('[Bilibili AdBlock] 1.4.2 / Biliverse 0.7.5 / iPad compatible');",
     });
   } finally {
     await build.close();

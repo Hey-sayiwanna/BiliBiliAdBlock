@@ -1,6 +1,6 @@
 import { Console, done } from "@nsnanocat/util";
 import gRPC from "@nsnanocat/grpc";
-import { Response } from "../upstream/Biliverse-ADBlock-v0.7.3/src/process/Response.mjs";
+import { Response } from "../upstream/Biliverse-ADBlock-v0.7.5/src/process/Response.mjs";
 import fixGrpcHeaders from "./fix-grpc-headers.mjs";
 
 // 上游错误必须保留，避免将网络失败重写成空的成功响应。
