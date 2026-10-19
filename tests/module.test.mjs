@@ -6,7 +6,7 @@ const moduleText = fs.readFileSync(new URL("../bilibiliADBLOCk", import.meta.url
 const prefix = "https://raw.githubusercontent.com/Hey-sayiwanna/bilibiliAdBlock/main/";
 const paths = [...moduleText.matchAll(/script-path=([^,\n]+)/g)].map(match => match[1]);
 
-test("every runtime script is self-hosted and exists locally", () => {
+test("every runtime script uses this repository and exists locally", () => {
   assert.ok(paths.length > 0);
   for (const path of paths) {
     assert.ok(path.startsWith(prefix), path);
@@ -31,4 +31,9 @@ test("binary response rules have no size cutoff that would skip large video page
     assert.match(line, /max-size=-1/);
     assert.match(line, /requires-body=true/);
   }
+});
+
+test("default search words use a native mock with no JavaScript request dependency", () => {
+  assert.ok(moduleText.split("\n").some(line => line.includes("DefaultWords") && line.includes("data-type=base64")));
+  assert.ok(moduleText.split("\n").every(line => !(line.includes("DefaultWords") && line.includes("script-path="))));
 });

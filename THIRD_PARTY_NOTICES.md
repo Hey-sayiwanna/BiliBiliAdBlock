@@ -1,16 +1,18 @@
 # Third-party notices
 
-## Biliverse/ADBlock v0.7.3 (active runtime)
+本项目从上游抽出去广告功能、精简 Surge 模块配置并进行针对性适配。感谢薯薯、Biliverse/ADBlock 及所有开源贡献者；核心去广告实现归功于上游项目。
 
-- Source: https://github.com/Biliverse/ADBlock/tree/v0.7.3
-- Source commit: `bf9f66250fe97383847ffabfcb6183fed752e181`
-- Source archive SHA-256: `f9755c2be14b57462f3bf7fa3c69c59175df790af89f199d5410d22a8edbb1cc`
-- License: Apache License 2.0, included in `upstream/Biliverse-ADBlock-v0.7.3/LICENSE`.
-- Unmodified source snapshot: `upstream/Biliverse-ADBlock-v0.7.3`.
-- Locally built active artifact: `vendor/Biliverse.ADBlock.v0.7.3.ipad-fix-v1.4.1.response.bundle.js`. The original 1.4.0 build remains available as a historical artifact.
+## Biliverse/ADBlock v0.7.5 (active runtime)
+
+- Source: https://github.com/Biliverse/ADBlock/tree/v0.7.5
+- Source commit: `b0051916843f269d4b377aaf177f0d9e7b12e393`
+- Source archive SHA-256: `5de8c0c2435aeef9eb333b05e6fb6704763e201edf962b4839b897ee86cca911`
+- License: Apache License 2.0, included in `upstream/Biliverse-ADBlock-v0.7.5/LICENSE`.
+- Unmodified source snapshot: `upstream/Biliverse-ADBlock-v0.7.5`.
+- Locally built active artifact: `vendor/Biliverse.ADBlock.v0.7.5.v1.4.2.response.bundle.js`. The v0.7.3 source snapshot and 1.4.0/1.4.1 runtime artifacts remain available for historical module references.
 - Build recipe: `scripts/build-vendor.mjs`; dependency versions are pinned in the root `package-lock.json`.
 
-The upstream source snapshot is unchanged. The build replaces the upstream entrypoint with `scripts/bilibili-response.mjs`, which preserves upstream HTTP/gRPC failures, returns the original response on exceptions and removes stale `bodyBytes` when returning a rewritten `body`. `scripts/fix-grpc-headers.mjs` extends the existing upstream client rules for iPad Moss requests: missing completion status is added only after successful processing. `scripts/bilibili-default-words.mjs` replaces the static DefaultWords mock with a client-aware response, retaining the international client exception. It also uses a local, deterministic version banner and omits the unused upstream configuration-page artifact. The Surge module selects advertising routes and explicit settings; it does not install the upstream settings UI, account/navigation rewrites, teenager-mode handler, or danmaku features.
+The upstream source snapshot is unchanged. The build replaces the upstream entrypoint with `scripts/bilibili-response.mjs`, which preserves upstream HTTP/gRPC failures, returns the original response on exceptions and removes stale `bodyBytes` when returning a rewritten `body`. `scripts/fix-grpc-headers.mjs` normalizes header names and extends the upstream client rules for legacy iPad Moss requests: missing completion status is added only after successful processing. DefaultWords now follows the upstream v0.7.5 native Surge mock: a five-byte empty gRPC message with HTTP 200 and grpc-status: 0 for all clients. The 1.4.1 request adapter and its built script are retained only as historical files and are not used or rebuilt by the current module. The response build uses a local, deterministic version banner and omits the unused upstream configuration-page artifact. The Surge module selects advertising routes and explicit settings; it does not install the upstream settings UI, account/navigation rewrites, teenager-mode handler, or danmaku features.
 
 `scripts/bilibili-json.js` is a local adaptation of the feed, splash, story and live-room handling. It keeps the existing local feed/live behavior, adds the missing commercial markers and story routes, and avoids treating `ad_info` alone as proof of an advertisement. `scripts/bilibili-json.v1.4.0.js` is its generated runtime copy.
 

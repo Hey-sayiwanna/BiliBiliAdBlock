@@ -55,8 +55,19 @@ for (const [agent, expected] of [["bili-universal/1", "0"], ["bili-blue/1", "0"]
     }, { requestHeaders: { "user-agent": agent } });
     assert.equal(header(result, "grpc-status"), expected);
     const mocked = await runDefaultWords("https://app.bilibili.com/bilibili.app.interface.v1.Search/DefaultWords", { "user-agent": agent });
-    assert.equal(header(mocked, "grpc-status"), expected);
+    assert.equal(header(mocked, "grpc-status"), "0");
     assert.deepEqual(Array.from(mocked.body), [0, 0, 0, 0, 0]);
+  });
+}
+
+for (const agent of ["bili-overseas/1", "grpc-c++/1 bili-overseas/1", "bili-hd/1"]) {
+  test(`${agent} completes Moss responses without removing recommendations`, async () => {
+    const payload = ViewReply.toBinary(ViewReply.create({ relates: [{ goto: "av", title: "keep" }, { goto: "cm" }] }));
+    const result = await runSurge("https://app.bilibili.com/bilibili.app.view.v1.View/View", {
+      status: 200, headers: { "content-type": "application/grpc" }, body: gRPC.encode(payload),
+    }, { requestHeaders: { "user-agent": agent } });
+    assert.equal(header(result, "grpc-status"), "0");
+    assert.deepEqual(ViewReply.fromBinary(gRPC.decode(result.body)).relates.map(item => item.title), ["keep"]);
   });
 }
 

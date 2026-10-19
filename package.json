@@ -1,12 +1,12 @@
 {
-  "name": "bilibili-adblock-self-hosted",
-  "version": "1.4.1",
+  "name": "bilibili-adblock",
+  "version": "1.4.2",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "node scripts/build-vendor.mjs",
     "test": "node --test tests/*.test.mjs",
-    "test:upstream": "node --test upstream/Biliverse-ADBlock-v0.7.3/tests/adTrackingHardening.test.mjs upstream/Biliverse-ADBlock-v0.7.3/tests/airelateAsync.test.mjs upstream/Biliverse-ADBlock-v0.7.3/tests/honoWorkerAdapter.test.mjs upstream/Biliverse-ADBlock-v0.7.3/tests/preferences-template.test.mjs"
+    "test:upstream": "node --test upstream/Biliverse-ADBlock-v0.7.5/tests/adTrackingHardening.test.mjs upstream/Biliverse-ADBlock-v0.7.5/tests/airelateAsync.test.mjs upstream/Biliverse-ADBlock-v0.7.5/tests/honoWorkerAdapter.test.mjs upstream/Biliverse-ADBlock-v0.7.5/tests/preferences-template.test.mjs upstream/Biliverse-ADBlock-v0.7.5/tests/grpcStatus.test.mjs upstream/Biliverse-ADBlock-v0.7.5/tests/nativeMock.test.mjs"
   },
   "devDependencies": {
     "@biliverse/protobuf": "1.1.0",
