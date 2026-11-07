@@ -19,7 +19,6 @@ for (const agent of [ipad, `grpc-c++/1.66.2 ${ipad}`]) {
       replies: Array.from({ length: 19 }, (_, i) => ({ content: { message: `normal ${i}` } })),
       topReplies: [{ content: { message: "normal pinned" } }], cm: {},
     }, decoded => { assert.equal(decoded.replies.length, 19); assert.equal(decoded.topReplies.length, 1); assert.equal(decoded.cm, undefined); }],
-    ["bilibili.main.community.reply.v2.Reply/SubjectDescription", SubjectDescriptionReply, {}, () => {}],
     ["bilibili.app.view.v1.View/View", ViewReply, {
       relates: [...Array.from({ length: 40 }, () => ({ goto: "av", title: "normal" })), { goto: "cm" }],
     }, decoded => { assert.equal(decoded.relates.length, 40); assert.ok(decoded.relates.every(item => item.goto === "av")); }],
@@ -34,6 +33,15 @@ for (const agent of [ipad, `grpc-c++/1.66.2 ${ipad}`]) {
       verify(type.fromBinary(gRPC.decode(result.body)));
     });
   }
+  test(`iPad comment editor response passes through untouched (${agent.startsWith("grpc") ? "grpc" : "native"} UA)`, async () => {
+    const response = {
+      status: 200, headers: { "content-type": "application/grpc" },
+      body: gRPC.encode(SubjectDescriptionReply.toBinary(SubjectDescriptionReply.create({}))),
+    };
+    const result = await runSurge("https://grpc.biliapi.net/bilibili.main.community.reply.v2.Reply/SubjectDescription", response,
+      { requestHeaders: { "user-agent": agent, "x-bili-moss-engine-type": "1" } });
+    assert.strictEqual(result, response);
+  });
 }
 
 for (const host of ["grpc.biliapi.net", "app.bilibili.com", "app.biliapi.net", "app.biliapi.com"]) {

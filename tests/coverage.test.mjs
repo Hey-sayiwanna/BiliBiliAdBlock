@@ -26,8 +26,6 @@ const paths = [
     "bilibili.app.dynamic.v2.Dynamic/DynAll",
     "bilibili.app.dynamic.v2.Dynamic/DynVideoPersonal",
     "bilibili.main.community.reply.v1.Reply/MainList",
-    "bilibili.main.community.reply.v1.Reply/DetailList",
-    "bilibili.main.community.reply.v2.Reply/SubjectDescription",
     "bilibili.pgc.gateway.player.v2.PlayURL/PlayView",
   ].map(path => ["grpc.biliapi.net", `/${path}`]),
 ];
@@ -49,5 +47,8 @@ test("account, navigation, normal playback and unrelated domains are outside the
     "https://api.bilibili.com/x/player/wbi/playurl?avid=1",
     "https://grpc.biliapi.net/bilibili.app.viewunite.v1.View/ViewOther",
     "https://example.com/bilibili.app.viewunite.v1.View/PlayPause",
+    "https://grpc.biliapi.net/bilibili.main.community.reply.v1.Reply/DetailList",
+    "https://grpc.biliapi.net/bilibili.main.community.reply.v1.Reply/ReplyInfo",
+    "https://grpc.biliapi.net/bilibili.main.community.reply.v2.Reply/SubjectDescription",
   ]) assert.equal(rules.filter(rule => rule.pattern.test(url)).length, 0, url);
 });
