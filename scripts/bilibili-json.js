@@ -56,7 +56,7 @@ function cleanResponse(path, data) {
       break;
     case "/x/v2/search/square":
       if (Array.isArray(data?.data)) {
-        data.data = data.data.filter((item) => item?.type !== "trending" && !isAd(item));
+        data.data = data.data.filter((item) => !isAd(item));
       }
       break;
     case "/x/resource/top/activity":

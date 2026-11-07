@@ -37,9 +37,14 @@ test("feed removes ads but keeps videos and normal banners", () => {
   assert.deepEqual(output.data.items[1].banner_item.map((item) => item.id), ["keep"]);
 });
 
-test("search removes trending and preserves other entries", () => {
-  const output = run("/x/v2/search/square", { data: [{ type: "trending" }, { type: "history", id: 1 }] });
-  assert.deepEqual(output.data, [{ type: "history", id: 1 }]);
+test("search preserves hot searches and history while removing explicit ads", () => {
+  const output = run("/x/v2/search/square", { data: [
+    { type: "trending", id: "hot" },
+    { type: "history", id: 1 },
+    { type: "ad", id: "ad" },
+    { card_type: "cm_v2", id: "promotion" },
+  ] });
+  assert.deepEqual(output.data, [{ type: "trending", id: "hot" }, { type: "history", id: 1 }]);
 });
 
 test("live tab removes banners and explicit ads only", () => {

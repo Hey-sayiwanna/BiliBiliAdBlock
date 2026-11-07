@@ -8,16 +8,16 @@
 https://raw.githubusercontent.com/Hey-sayiwanna/bilibiliAdBlock/main/bilibiliADBLOCk
 ```
 
-订阅地址保持不变，后续在 Surge 中点击“立即更新”即可。当前模块版本：**1.5.0**。
+订阅地址保持不变，后续在 Surge 中点击“立即更新”即可。当前模块版本：**1.5.1**。
 
 ## 安装与更新
 
-1. 使用上面的地址安装或更新模块，确认版本为 **1.5.0**；旧模块副本或处理相同接口的其他模块请先停用。
+1. 使用上面的地址安装或更新模块，确认版本为 **1.5.1**；旧模块副本或处理相同接口的其他模块请先停用。
 2. 开启模块、脚本、HTTP 重写和 MitM，并安装、完全信任 Surge 证书。
 3. 更新模块引用的脚本，等待两个脚本文件下载完成。
 4. 完全退出 B站 App 后重新打开。
 
-脚本使用带版本的文件名，减少旧缓存影响。默认搜索词已由模块直接返回完整空响应，不再依赖请求脚本。
+脚本使用带版本的文件名，减少旧缓存影响。默认搜索词和热搜榜正常显示；搜索页仍过滤能够识别的商业广告卡片。
 
 ## 去广告范围
 
@@ -30,6 +30,11 @@ https://raw.githubusercontent.com/Hey-sayiwanna/bilibiliAdBlock/main/bilibiliADB
 保留底部完整导航（包括“会员购”）、“我的”页面、普通评论、非广告活动横幅和动态“最常访问”。本模块优先使用自己的广告选项，避免旧 BoxJS 设置关闭过滤。无法识别并剪除已经录入视频画面的口播或植入广告；接口变化后仍可能需要针对性补充。
 
 ## 更新日志
+
+### 2026-11-07（v1.5.1）
+
+- 恢复搜索框默认推荐词和搜索页热搜榜，保留搜索页及综合搜索结果的商业广告过滤；其余去广告规则不变。
+- 为搜索页 JSON 脚本启用新版本文件，保留旧版供直播规则和旧模块使用。
 
 ### 2026-11-07（v1.5.0）
 
@@ -68,12 +73,12 @@ https://raw.githubusercontent.com/Hey-sayiwanna/bilibiliAdBlock/main/bilibiliADB
 | 文件 | 作用 |
 | --- | --- |
 | `bilibiliADBLOCk` | Surge 模块安装入口，订阅地址保持不变 |
-| `scripts/bilibili-json.js` / `scripts/bilibili-json.v1.4.0.js` | JSON 去广告源码与当前运行文件；本次未改动其过滤逻辑 |
+| `scripts/bilibili-json.js` / `scripts/bilibili-json.v1.5.1.js` | JSON 去广告源码与搜索/信息流当前运行文件；旧版 v1.4.0 继续供直播使用 |
 | `scripts/bilibili-response.mjs` / `scripts/fix-grpc-headers.mjs` | Protobuf/gRPC 处理入口与客户端兼容适配 |
 | `vendor/Biliverse.ADBlock.v0.7.5.v1.4.2.response.bundle.js` | 当前 Protobuf/gRPC 运行脚本 |
 | `upstream/` / `scripts/build-vendor.mjs` / `tests/` | 上游源码快照、构建入口与回归测试 |
 
-旧版本产物保留供旧模块引用；当前模块仅引用上表的两个运行文件。
+旧版本产物保留供旧模块引用；直播规则仍引用 `scripts/bilibili-json.v1.4.0.js`，其余规则引用上表的运行文件。
 
 ## 鸣谢与开源说明
 

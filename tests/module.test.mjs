@@ -22,7 +22,7 @@ test("account and bottom navigation are outside every response rule", () => {
 });
 
 test("published local JSON artifact matches its maintained source", () => {
-  assert.equal(fs.readFileSync(new URL("../scripts/bilibili-json.v1.4.0.js", import.meta.url), "utf8"),
+  assert.equal(fs.readFileSync(new URL("../scripts/bilibili-json.v1.5.1.js", import.meta.url), "utf8"),
     fs.readFileSync(new URL("../scripts/bilibili-json.js", import.meta.url), "utf8"));
 });
 
@@ -37,9 +37,11 @@ test("binary response rules: video page capped at 512KB, all others unlimited", 
   }
 });
 
-test("default search words use a native mock with no JavaScript request dependency", () => {
-  assert.ok(moduleText.split("\n").some(line => line.includes("DefaultWords") && line.includes("data-type=base64")));
-  assert.ok(moduleText.split("\n").every(line => !(line.includes("DefaultWords") && line.includes("script-path="))));
+test("default search words are untouched while search advertising is still filtered", () => {
+  assert.ok(moduleText.split("\n").every(line => line.startsWith("#") || !line.includes("Search/DefaultWords")));
+  assert.ok(moduleText.includes("bilibili-search-result-ad ="));
+  assert.ok(moduleText.includes("Search.AD=true"));
+  assert.ok(moduleText.includes("search/square"));
 });
 
 test("every script gives up after 10 seconds instead of 60", () => {
