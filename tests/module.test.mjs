@@ -26,10 +26,14 @@ test("published local JSON artifact matches its maintained source", () => {
     fs.readFileSync(new URL("../scripts/bilibili-json.js", import.meta.url), "utf8"));
 });
 
-test("binary response rules have no size cutoff that would skip large video pages", () => {
+test("binary response rules: video page capped at 512KB, all others unlimited", () => {
   for (const line of moduleText.split("\n").filter(line => line.includes("type=http-response") && line.includes("binary-body-mode=1"))) {
-    assert.match(line, /max-size=-1/);
     assert.match(line, /requires-body=true/);
+    if (line.startsWith("Bili.Player.AdPatch =")) {
+      assert.match(line, /max-size=524288/);
+    } else {
+      assert.match(line, /max-size=-1/);
+    }
   }
 });
 
