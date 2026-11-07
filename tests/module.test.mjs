@@ -41,3 +41,9 @@ test("default search words use a native mock with no JavaScript request dependen
   assert.ok(moduleText.split("\n").some(line => line.includes("DefaultWords") && line.includes("data-type=base64")));
   assert.ok(moduleText.split("\n").every(line => !(line.includes("DefaultWords") && line.includes("script-path="))));
 });
+
+test("every script gives up after 10 seconds instead of 60", () => {
+  for (const line of moduleText.split("\n").filter(line => line.includes("script-path="))) {
+    assert.match(line, /timeout=10(?:,|$)/, line);
+  }
+});
