@@ -8,7 +8,7 @@
 https://raw.githubusercontent.com/Hey-sayiwanna/bilibiliAdBlock/main/bilibiliADBLOCk
 ```
 
-订阅地址保持不变，后续在 Surge 中点击“立即更新”即可。当前模块版本：**1.5.1**。
+订阅地址保持不变，后续在 Surge 中点击“立即更新”即可。当前模块版本：**1.5.2**。
 
 ## 安装与更新
 
