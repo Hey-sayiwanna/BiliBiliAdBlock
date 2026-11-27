@@ -12,7 +12,7 @@ https://raw.githubusercontent.com/Hey-sayiwanna/bilibiliAdBlock/main/bilibiliADB
 
 ## 安装与更新
 
-1. 使用上面的地址安装或更新模块，确认版本为 **1.5.1**；旧模块副本或处理相同接口的其他模块请先停用。
+1. 使用上面的地址安装或更新模块，确认版本；旧模块副本或处理相同接口的其他模块请先停用。
 2. 开启模块、脚本、HTTP 重写和 MitM，并安装、完全信任 Surge 证书。
 3. 更新模块引用的脚本，等待两个脚本文件下载完成。
 4. 完全退出 B站 App 后重新打开。
